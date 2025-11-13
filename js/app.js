@@ -342,18 +342,49 @@ $('menu-about').addEventListener('click', () => alert(`Vocab Trainer PWA
 Режим самопроверки: нажмите «Показать перевод».
 Отмечайте сложные слова кнопкой «В Hard».`));
 
-// запуск игр через выпадающий список
-$('game-select')?.addEventListener('change', (e) => {
-  const val = e.target.value;
-  if (val === 'brick') {
-    const btn = $('game-brick-start');
-    if (btn) btn.click();          // переиспользуем существующую логику
-  } else if (val === 'falling') {
-    const btn = $('game-falling-start');
-    if (btn) btn.click();
+// запуск игр через выпадающий список (прямой, без кнопок)
+let pendingGameId = null;
+
+$('game-select')?.addEventListener('change', async (e) => {
+  const id = e.target.value;
+  const words = getLessonWordsForGame();
+
+  // если урок не выбран — уводим на выбор и запомним, что хотели запустить
+  if (!words?.length) {
+    pendingGameId = id;
+    gotoLessons();
+    e.target.selectedIndex = 0;
+    return;
   }
-  e.target.selectedIndex = 0;      // вернуть "Выберите игру..."
+
+  if (id === 'brick') {
+    const mod = await import('./games/brick-match.js');
+    mod.startGame(words);
+  } else if (id === 'falling') {
+    const mod = await import('./games/falling-words.js');
+    mod.startGame(words);
+  }
+  e.target.selectedIndex = 0;
 });
+
+// автозапуск после выбора урока
+document.addEventListener('lesson-selected', async () => {
+  if (!pendingGameId) return;
+  const words = getLessonWordsForGame();
+  if (!words?.length) return;
+
+  const id = pendingGameId;
+  pendingGameId = null;
+
+  if (id === 'brick') {
+    const mod = await import('./games/brick-match.js');
+    mod.startGame(words);
+  } else if (id === 'falling') {
+    const mod = await import('./games/falling-words.js');
+    mod.startGame(words);
+  }
+});
+
 
 
 /* Клавиатура (desktop) */

@@ -22,6 +22,14 @@ function gotoGameScreen() {
   });
 }
 
+export function startGame(words) {
+  // если урок не выбран — попросим выбрать (как у тебя сделано для кнопки)
+  if (!words?.length) return;
+  BrickMatch.gotoGameScreen();
+  BrickMatch.start(words);
+}
+
+
 const BrickMatch = (() => {
   let gridEl, leftEl, metaEl, tiles = [], picked = null;
 
