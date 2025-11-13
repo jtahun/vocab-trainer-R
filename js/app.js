@@ -342,6 +342,20 @@ $('menu-about').addEventListener('click', () => alert(`Vocab Trainer PWA
 Режим самопроверки: нажмите «Показать перевод».
 Отмечайте сложные слова кнопкой «В Hard».`));
 
+// запуск игр через выпадающий список
+$('game-select')?.addEventListener('change', (e) => {
+  const val = e.target.value;
+  if (val === 'brick') {
+    const btn = $('game-brick-start');
+    if (btn) btn.click();          // переиспользуем существующую логику
+  } else if (val === 'falling') {
+    const btn = $('game-falling-start');
+    if (btn) btn.click();
+  }
+  e.target.selectedIndex = 0;      // вернуть "Выберите игру..."
+});
+
+
 /* Клавиатура (desktop) */
 window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === 'Enter') next();
