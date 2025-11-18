@@ -13,6 +13,8 @@
   <script defer type="module" src="js/app.js"></script>
   <script defer type="module" src="js/games/brick-match.js"></script>
   <script defer type="module" src="js/games/falling-words.js"></script>
+  <script defer type="module" src="js/games/unscramble.js"></script>
+
 
 
 </head>
@@ -37,6 +39,7 @@
     <option value="" disabled selected>Выберите игру…</option>
     <option value="brick">🧱 Стена пар</option>
     <option value="falling">🪂 Падающие слова</option>
+	<option value="unscr">🔤 Unscramble</option>
   </select>
  </div>
 
@@ -129,6 +132,23 @@
   </div>
 </section>
 
+  <!-- === ИГРА 3: Unscramble Words === -->
+<section id="screen-unscr" class="card hide">
+  <div class="row" style="gap:8px; margin-bottom:10px;">
+    <strong>🔤 Unscramble</strong>
+    <span class="muted" style="margin-left:auto;">Ошибок: <span id="un-errors">0</span></span>
+    <span class="muted">Слово: <span id="un-round">0/0</span></span>
+  </div>
+
+  <div id="un-word" class="un-word"></div>
+
+  <input id="un-input" class="un-input" placeholder="Введите слово…" autocomplete="off">
+
+  <div class="row" style="margin-top:12px;">
+    <button id="un-submit" class="btn btn-xl">OK</button>
+    <button id="un-exit" class="btn btn-outline">←</button>
+  </div>
+</section>
   
   </body>
 </html>
