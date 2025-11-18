@@ -363,6 +363,9 @@ $('game-select')?.addEventListener('change', async (e) => {
   } else if (id === 'falling') {
     const mod = await import('./games/falling-words.js');
     mod.startGame(words);
+  } else if (id === 'unscr') {
+    const mod = await import('./games/unscramble.js');
+	mod.startGame(words);
   }
   e.target.selectedIndex = 0;
 });
@@ -382,6 +385,9 @@ document.addEventListener('lesson-selected', async () => {
   } else if (id === 'falling') {
     const mod = await import('./games/falling-words.js');
     mod.startGame(words);
+  } else if (id === 'unscr') {
+    const mod = await import('./games/unscramble.js');
+	mod.startGame(words);
   }
 });
 

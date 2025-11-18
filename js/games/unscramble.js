@@ -89,28 +89,3 @@ $('un-exit')?.addEventListener('click', () => {
   show($('screen-unscr'), false);
   show($('screen-menu'), true);
 });
-
-// запуск через выбор игры
-$('game-select')?.addEventListener('change', async (e) => {
-  if (e.target.value !== 'unscr') return;
-
-  const w = getLessonWordsForGame();
-  if (!w?.length) {
-    pendingStart = true;
-    gotoLessons();
-    e.target.selectedIndex = 0;
-    return;
-  }
-  startGame(w);
-  e.target.selectedIndex = 0;
-});
-
-// автостарт после выбора урока
-document.addEventListener('lesson-selected', () => {
-  if (!pendingStart) return;
-  const w = getLessonWordsForGame();
-  if (w?.length) {
-    pendingStart = false;
-    startGame(w);
-  }
-});
