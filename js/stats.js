@@ -3,8 +3,8 @@
 
 // 1) ИМПОРТЫ SDK (версию X.Y.Z возьми из "Project settings → Web app → CDN")
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/X.Y.Z/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/X.Y.Z/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // 2) ТВОЙ КОНФИГ (скопируй из Firebase → Project settings → Web app)
 const firebaseConfig = {
