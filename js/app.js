@@ -1,5 +1,7 @@
 /* js/app.js */
 /* Глобальные утилиты приходят из utils.js: $, show, clamp, escapeHtml, shuffleArray, fetchJsonNoCache */
+import { startSession, endSession, onLessonStart } from './stats.js';
+
 
 const WORDS_URL = './words.json';
 const LS_HARD_KEY = 'vocabHardSetV1';
@@ -166,6 +168,7 @@ function buildMetaForLesson(lesson) {
 function openLesson(lesson) {
   const L = buildMetaForLesson({ ...lesson });
   state.currentLesson = L;
+  onLessonStart(lesson.id);
   state.idx = 0;
   state.order = [...Array(L.words.length).keys()];
   state.revealed = false;
@@ -472,6 +475,9 @@ function runSelfTests(errorMode = false) {
 /* ===== Boot ===== */
 (async () => {
   try {
+	// запускаем учёт сессии (как только всё загрузилось)
+    startSession();
+	
     const books = await loadBooks();
     state.bookId = books[0] ? String(books[0].id) : '1';
     populateBookSelect(books);
@@ -490,6 +496,11 @@ function runSelfTests(errorMode = false) {
     runSelfTests(true);
   }
 })();
+
+// когда пользователь закрывает / перезагружает вкладку
+window.addEventListener('beforeunload', () => {
+  endSession();
+});
 
 /* ===== SW registration (optional) ===== */
 if ('serviceWorker' in navigator) {

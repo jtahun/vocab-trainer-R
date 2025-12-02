@@ -1,4 +1,6 @@
-import { getLessonWordsForGame, setHome, gotoLessons } from '../app.js';
+import { getLessonWordsForGame, getCurrentLessonId, setHome, gotoLessons } from '../app.js';
+import { onGameStart, onGameError, onGameEnd } from '../stats.js';
+
 
 /** Конфиг игры */
 const CFG = {
@@ -39,6 +41,10 @@ function gotoFallingScreen() {
 export function startGame(extWords) {
   words = Array.isArray(extWords) ? extWords.filter(p => Array.isArray(p) && p.length >= 2) : [];
   if (!words.length) return;
+
+  // ID урока для Firebase-статистики
+  const lessonId = typeof getCurrentLessonId === 'function' ? (getCurrentLessonId() ?? null) : null;
+  onGameStart('falling-words', lessonId);
 
   // Подготовка
   errors = 0;
@@ -113,7 +119,7 @@ function nextRound() {
   spawnFallingWord(target.en);
 }
 
-/** Спавн падающего слова */
+/** Вызов падающего слова */
 function spawnFallingWord(text) {
   const area = $('fw-area');
   clearArea();
@@ -132,6 +138,7 @@ function spawnFallingWord(text) {
     // если слово ещё не обработано кликом:
     if (area.contains(el)) {
       errors++;
+      onGameError();                           // ⇐ логируем ошибку в Firebase
       $('fw-errors').textContent = errors;
       // Ускоряемся даже при ошибке (или только при верном? выбери стиль)
       speedX += CFG.accelStep;
@@ -188,6 +195,7 @@ function renderOptions(opts, target) {
       } else {
         // ошибка и переходим дальше
         errors++;
+        onGameError();                       // ⇐ логируем ошибку в Firebase
         $('fw-errors').textContent = errors;
         // лёгкая «тряска» неверной кнопки
         btn.animate(
@@ -214,8 +222,18 @@ function finish() {
   stopTimer();
   // Итоги
   const timeTxt = $('fw-time').textContent;
+
+  // Статистика в Firebase
+  onGameEnd({
+    errors,
+    speedX,
+    timeShown: timeTxt,
+    roundsPlayed: totalRounds,
+  });
+
   const msg = `Готово!\nВремя: ${timeTxt}\nОшибок: ${errors}\nСкорость: ${speedX.toFixed(1)}x`;
   alert(msg);
+
   // Возврат в меню
   show($('screen-falling'), false);
   show($('screen-menu'), true);

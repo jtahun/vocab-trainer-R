@@ -1,8 +1,7 @@
 import { getLessonWordsForGame, setHome, gotoLessons, getCurrentLessonId } from '../app.js';
-
+import { onGameStart, onGameError, onGameEnd } from '../stats.js';
 
 let pendingBrickStart = false;
-
 
 function requestLessonThenStart() {
   pendingBrickStart = true;
@@ -25,13 +24,24 @@ function gotoGameScreen() {
 export function startGame(words) {
   // если урок не выбран — попросим выбрать (как у тебя сделано для кнопки)
   if (!words?.length) return;
-  BrickMatch.gotoGameScreen();
+
+  // ID урока для Firebase-статистики
+  const lessonId =
+    typeof getCurrentLessonId === 'function'
+      ? (getCurrentLessonId() ?? null)
+      : null;
+
+  onGameStart('brick-match', lessonId);
+
+  gotoGameScreen();
   BrickMatch.start(words);
 }
 
-
 const BrickMatch = (() => {
   let gridEl, leftEl, metaEl, tiles = [], picked = null;
+  let lock = false;
+  let errors = 0;
+  let totalPairs = 0;
 
   const buildTiles = (pairs) => shuffle(
     pairs.flatMap(([en, ru], idx) => ([
@@ -42,17 +52,21 @@ const BrickMatch = (() => {
 
   const render = () => {
     gridEl.innerHTML = '';
-    if (!tiles.length) { gridEl.innerHTML = '<div class="empty-hint">Список пуст. Выбери урок.</div>'; return; }
+    if (!tiles.length) {
+      gridEl.innerHTML = '<div class="empty-hint">Список пуст. Выбери урок.</div>';
+      return;
+    }
     tiles.forEach(t => {
       const el = document.createElement('button');
-      el.className = 'brick'; el.type='button'; el.textContent = t.text; t.el = el;
+      el.className = 'brick';
+      el.type = 'button';
+      el.textContent = t.text;
+      t.el = el;
       el.addEventListener('click', () => onPick(t));
       gridEl.appendChild(el);
     });
     updateHUD();
   };
-
- let lock = false;
 
   const onPick = (tile) => {
     if (lock || tile.matched) return;
@@ -91,6 +105,9 @@ const BrickMatch = (() => {
       }, 120);
     } else {
       // не пара
+      errors++;
+      onGameError(); // логируем ошибку в Firebase
+
       shake(picked.el); 
       shake(tile.el);
       picked.el.classList.remove('selected');
@@ -98,19 +115,41 @@ const BrickMatch = (() => {
     }
   };
 
-  
+  const shake = (el) => el.animate(
+    [
+      { transform:'translateX(0)' },
+      { transform:'translateX(-4px)' },
+      { transform:'translateX(4px)' },
+      { transform:'translateX(0)' }
+    ],
+    { duration:150, iterations:1 }
+  );
 
-  const shake = (el) => el.animate([
-    { transform:'translateX(0)' },{ transform:'translateX(-4px)' },
-    { transform:'translateX(4px)' },{ transform:'translateX(0)' }
-  ], { duration:150, iterations:1 });
+  const leftPairs = () => tiles.filter(x => !x.matched).length / 2;
 
-  const leftPairs = () => tiles.filter(x=>!x.matched).length/2;
-  const updateHUD = () => $('game-left').textContent = `Осталось: ${leftPairs()}`;
-  const checkWin = () => { if (leftPairs()===0) metaEl.textContent = 'Готово! 🎉 Все пары найдены'; };
+  const updateHUD = () => {
+    $('game-left').textContent = `Осталось: ${leftPairs()}`;
+  };
+
+  const checkWin = () => {
+    if (leftPairs() === 0) {
+      metaEl.textContent = 'Готово! 🎉 Все пары найдены';
+
+      onGameEnd({
+        pairsTotal: totalPairs,
+        errors,
+      });
+    }
+  };
 
   const start = (pairs) => { 
-    gridEl = $('game-grid'); leftEl = $('game-left'); metaEl = $('game-meta');
+    gridEl = $('game-grid');
+    leftEl = $('game-left');
+    metaEl = $('game-meta');
+
+    errors = 0;
+    totalPairs = pairs.length;
+
     tiles = buildTiles(pairs);
     $('game-title').textContent = '🧱 Стена пар';
     metaEl.textContent = `${pairs.length} пар · EN↔RU`;
@@ -141,8 +180,7 @@ $('game-brick-start')?.addEventListener('click', () => {
   }
 
   // урок уже выбран → запускаем сразу
-  BrickMatch.gotoGameScreen();
-  BrickMatch.start(words);
+  startGame(words);
 });
 
 // когда пользователь выбрал урок — стартуем игру автоматически
@@ -152,11 +190,9 @@ document.addEventListener('lesson-selected', () => {
   const words = getLessonWordsForGame();
   if (words?.length) {
     pendingBrickStart = false;
-    BrickMatch.gotoGameScreen();
-    BrickMatch.start(words);
+    startGame(words);
   }
 });
-
 
 $('game-exit')?.addEventListener('click', () => {
   pendingBrickStart = false; 
