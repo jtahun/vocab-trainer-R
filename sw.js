@@ -1,4 +1,4 @@
-const CACHE='vocab-json-v7.95';
+const CACHE='vocab-json-v7.952';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',e=>{

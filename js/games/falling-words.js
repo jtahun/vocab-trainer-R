@@ -1,23 +1,27 @@
 import { getLessonWordsForGame, getCurrentLessonId, setHome, gotoLessons } from '../app.js';
 import { onGameStart, onGameError, onGameEnd } from '../stats.js';
 
-
 /** Конфиг игры */
 const CFG = {
-  roundsMax:  Math.min(20, 999), // или возьмём все слова, если их < 20
-  options:    4,                 // 4 варианта
-  baseSecs:   4.0,               // базовое время падения (сек)
-  minSecs:    1.8,               // минимально возможная длительность
-  accelStep:  0.10               // на сколько ускоряемся каждый раунд (в x)
+  // сколько раз каждое слово должно появиться в игре
+  repeatsPerWord: 3,
+
+  options:   4,         // 4 варианта ответа
+  baseSecs:  4.0,       // базовое время падения (сек)
+  minSecs:   1.8,       // минимально возможная длительность
+
+  // ускорение теперь в 3 раза слабее, чем было (0.10 / 3 ≈ 0.033)
+  accelStep: 0.10 / 3
 };
 
 let words = [];          // [['heavy','тяжелый'], ...] из текущего урока
+let playQueue = [];      // очередь слов на все раунды (каждое слово повторяется 3 раза)
 let round = 0;
 let totalRounds = 0;
 let errors = 0;
 let t0 = 0;
 let timerId = null;
-let speedX = 1.0;        // множитель скорости (1.0 → нормально, 1.2 → быстрее)
+let speedX = 1.0;        // множитель скорости (1.0 → норм, 1.2 → быстрее)
 let pendingStart = false;
 
 function gotoFallingScreen() {
@@ -37,20 +41,39 @@ function gotoFallingScreen() {
   $('fw-speed').textContent  = speedX.toFixed(1) + 'x';
 }
 
+/** Построение очереди: каждая пара повторяется repeatsPerWord раз */
+function buildPlayQueue(basePairs, repeatsPerWord) {
+  const queue = [];
+  for (let i = 0; i < repeatsPerWord; i++) {
+    // копия массива и перемешивание, чтобы каждый круг был в случайном порядке
+    const batch = [...basePairs];
+    window.shuffle?.(batch) || batch.sort(() => Math.random() - 0.5);
+    queue.push(...batch);
+  }
+  return queue;
+}
+
 /** Старт игры извне */
 export function startGame(extWords) {
-  words = Array.isArray(extWords) ? extWords.filter(p => Array.isArray(p) && p.length >= 2) : [];
+  words = Array.isArray(extWords)
+    ? extWords.filter(p => Array.isArray(p) && p.length >= 2)
+    : [];
   if (!words.length) return;
 
   // ID урока для Firebase-статистики
-  const lessonId = typeof getCurrentLessonId === 'function' ? (getCurrentLessonId() ?? null) : null;
+  const lessonId = typeof getCurrentLessonId === 'function'
+    ? (getCurrentLessonId() ?? null)
+    : null;
   onGameStart('falling-words', lessonId);
 
   // Подготовка
   errors = 0;
   round = 0;
-  totalRounds = Math.min(CFG.roundsMax, words.length);
   speedX = 1.0;
+
+  // Формируем очередь: каждое слово повторяется 3 раза
+  playQueue = buildPlayQueue(words, CFG.repeatsPerWord);
+  totalRounds = playQueue.length; // = words.length * repeatsPerWord
 
   gotoFallingScreen();
   $('fw-round').textContent = `0/${totalRounds}`;
@@ -106,11 +129,14 @@ function stopTimer() {
 function nextRound() {
   if (round >= totalRounds) return finish();
 
+  // берём следующую пару из очереди
+  const pair = playQueue[round]; // [en, ru]
   round++;
+
   $('fw-round').textContent = `${round}/${totalRounds}`;
 
-  // Подготовить цель + отвлекающие
-  const { target, options } = pickQuestion(words, CFG.options);
+  // Подготовить цель + отвлекающие (цель фиксированная — pair)
+  const { target, options } = pickQuestion(words, CFG.options, pair);
 
   // UI: варианты
   renderOptions(options, target);
@@ -140,9 +166,11 @@ function spawnFallingWord(text) {
       errors++;
       onGameError();                           // ⇐ логируем ошибку в Firebase
       $('fw-errors').textContent = errors;
-      // Ускоряемся даже при ошибке (или только при верном? выбери стиль)
+
+      // Ускоряемся (теперь шаг в 3 раза меньше, чем раньше через CFG.accelStep)
       speedX += CFG.accelStep;
       $('fw-speed').textContent = speedX.toFixed(1) + 'x';
+
       nextRound();
     }
     el.remove();
@@ -152,11 +180,20 @@ function spawnFallingWord(text) {
   area.appendChild(el);
 }
 
-/** Генерация вопроса: правильный перевод + 3 отвлекающих */
-function pickQuestion(pairs, nOptions) {
-  // Выбрать цель
-  const idx = Math.floor(Math.random() * pairs.length);
-  const [en, ru] = pairs[idx];
+/**
+ * Генерация вопроса: правильный перевод + 3 отвлекающих
+ * Если передана forcedPair, используем её как цель.
+ */
+function pickQuestion(pairs, nOptions, forcedPair = null) {
+  let en, ru;
+
+  if (forcedPair) {
+    [en, ru] = forcedPair;
+  } else {
+    // старое поведение — случайный выбор
+    const idx = Math.floor(Math.random() * pairs.length);
+    [en, ru] = pairs[idx];
+  }
 
   // Собрать отвлекающие
   const pool = pairs.map(p => p[1]);
@@ -188,7 +225,7 @@ function renderOptions(opts, target) {
       if (!falling) return; // уже упало и раунд завершён
 
       if (o.correct) {
-        // верно → удаляем падающее слово, ускоряемся сильнее
+        // верно → удаляем падающее слово, ускоряемся
         falling.remove();
         speedX += CFG.accelStep;
         $('fw-speed').textContent = speedX.toFixed(1) + 'x';
@@ -199,8 +236,13 @@ function renderOptions(opts, target) {
         $('fw-errors').textContent = errors;
         // лёгкая «тряска» неверной кнопки
         btn.animate(
-          [{ transform:'translateX(0)'},{ transform:'translateX(-4px)'},{ transform:'translateX(4px)'},{ transform:'translateX(0)'}],
-          { duration:150, iterations:1 }
+          [
+            { transform: 'translateX(0)' },
+            { transform: 'translateX(-4px)' },
+            { transform: 'translateX(4px)' },
+            { transform: 'translateX(0)' }
+          ],
+          { duration: 150, iterations: 1 }
         );
         // слово продолжит падать; если хочется — можно сразу завершать раунд:
         // falling.remove();
