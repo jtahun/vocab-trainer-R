@@ -83,6 +83,39 @@ export async function onLessonStart(lessonId) {
   }
 }
 
+// ---- ПРОСМОТР СПИСКА СЛОВ ----
+export async function onListViewStart(lessonId) {
+  if (!currentUserId) return;
+  try {
+    await addDoc(collection(db, "listViewStarts"), {
+      userId: currentUserId,
+      sessionId: currentSession?.id || null,
+      lessonId: lessonId ?? null,
+      startedAt: serverTimestamp(),
+    });
+  } catch (e) {
+    console.warn('onListViewStart error:', e);
+  }
+}
+
+// ---- СТАРТ ПРОВЕРКИ СЛОВ (КАРТОЧКИ) ----
+// mode: 'lesson' | 'all' | 'hard'
+export async function onSelfCheckStart({ mode = 'lesson', lessonId = null } = {}) {
+  if (!currentUserId) return;
+  try {
+    await addDoc(collection(db, "selfCheckStarts"), {
+      userId: currentUserId,
+      sessionId: currentSession?.id || null,
+      lessonId,
+      mode,
+      startedAt: serverTimestamp(),
+    });
+  } catch (e) {
+    console.warn('onSelfCheckStart error:', e);
+  }
+}
+
+
 // ---- ИГРЫ ----
 export function onGameStart(gameName, lessonId) {
   currentGame = {

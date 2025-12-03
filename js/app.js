@@ -1,6 +1,6 @@
 /* js/app.js */
 /* Глобальные утилиты приходят из utils.js: $, show, clamp, escapeHtml, shuffleArray, fetchJsonNoCache */
-import { startSession, endSession, onLessonStart } from './stats.js';
+import { startSession, endSession, onLessonStart, onListViewStart, onSelfCheckStart } from './stats.js';
 
 
 const WORDS_URL = './words.json';
@@ -119,6 +119,11 @@ function gotoList() {
   show($('btn-menu'), true);
   setHome('К урокам', backToLessons);
   document.querySelector('h1 .muted').textContent = '· список';
+  
+  // Логируем старт просмотра списка слов текущего урока
+  if (state.currentLesson?.id) {
+    onListViewStart(state.currentLesson.id);
+  }
 }
 
 
@@ -192,9 +197,14 @@ function playAll() {
   state.idx = 0; state.order = [...Array(words.length).keys()]; state.revealed = false;
   $('lesson-title').textContent = all.title;
   $('badge-count').textContent = `${words.length} слов`;
+
+  // старт проверки по всем словам
+  onSelfCheckStart({ mode: 'all', lessonId: null });
+
   gotoViewer();
   renderCard();
 }
+
 
 function playHard() {
   const words = [];
@@ -211,9 +221,14 @@ function playHard() {
   state.idx = 0; state.order = [...Array(words.length).keys()]; state.revealed = false;
   $('lesson-title').textContent = hard.title;
   $('badge-count').textContent = `${words.length} слов`;
+
+  // старт проверки по HARD-словам
+  onSelfCheckStart({ mode: 'hard', lessonId: null });
+
   gotoViewer();
   renderCard();
 }
+
 
 function backToLessons() {
   state.currentLesson = null;
@@ -323,6 +338,11 @@ $('book-select').addEventListener('change', async (e) => {
 
 const btnStartCheck = $('btn-start-check');
 if (btnStartCheck) btnStartCheck.addEventListener('click', () => {
+  const lessonId = state.currentLesson?.id ?? null;
+
+  // старт проверки по одному уроку
+  onSelfCheckStart({ mode: 'lesson', lessonId });
+
   state.idx = 0;
   state.revealed = false;
   gotoViewer();
