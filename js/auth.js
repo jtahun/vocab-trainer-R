@@ -1,4 +1,4 @@
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { setCurrentUserId } from "./stats.js";
 
 const $ = (id) => document.getElementById(id);
@@ -6,6 +6,10 @@ const $ = (id) => document.getElementById(id);
 
 const auth = getAuth();
 let currentUser = null;
+export function getCurrentUser() {
+  return currentUser;
+}
+
 
 export async function login(email, password) {
   const res = await signInWithEmailAndPassword(auth, email, password);
