@@ -26,6 +26,11 @@ let currentUserId = null;
 let currentSession = null; // { id, startedAt }
 let currentGame = null;    // { gameName, lessonId, startedAt, errors }
 
+// ---- АВТОРИЗАЦИЯ  ----
+export function setCurrentUserId(uid) {
+  currentUserId = uid;
+}
+
 // ---- АВТОРИЗАЦИЯ (анонимная) ----
 signInAnonymously(auth).catch(console.error);
 

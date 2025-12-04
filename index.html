@@ -15,6 +15,7 @@
   <script defer type="module" src="js/games/falling-words.js"></script>
   <script defer type="module" src="js/games/unscramble.js"></script>
   <script defer type="module" src="js/stats.js"></script>
+  <script defer type="module" src="js/auth.js"></script>
 
 
 
@@ -150,6 +151,22 @@
     <button id="un-exit" class="btn btn-outline">←</button>
   </div>
 </section>
+
+<div id="screen-login" class="screen" style="display:none;">
+  <h2>Вход</h2>
+
+  <input id="login-email" type="email" placeholder="Email" />
+  <input id="login-password" type="password" placeholder="Пароль" />
+
+  <button id="btn-login">Войти</button>
+</div>
+
+<div id="auth-bar" style="display:none; position:fixed; top:5px; right:10px; font-size:12px;">
+  <span id="auth-user"></span>
+  <button id="btn-logout">Выйти</button>
+</div>
+
+
   
   </body>
 </html>

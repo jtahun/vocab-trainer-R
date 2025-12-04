@@ -1,6 +1,8 @@
 /* js/app.js */
 /* Глобальные утилиты приходят из utils.js: $, show, clamp, escapeHtml, shuffleArray, fetchJsonNoCache */
 import { startSession, endSession, onLessonStart, onListViewStart, onSelfCheckStart } from './stats.js';
+import { login, logout, getCurrentUser } from './auth.js';
+
 
 
 const WORDS_URL = './words.json';
