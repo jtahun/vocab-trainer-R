@@ -1,5 +1,6 @@
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { setCurrentUserId } from "./stats.js";
+import { setCurrentUserId, startSession, endSession } from "./stats.js";
+
 
 const $ = (id) => document.getElementById(id);
 
@@ -48,7 +49,7 @@ $('btn-login')?.addEventListener('click', async () => {
 $('btn-logout')?.addEventListener('click', () => logout());
 
 // наблюдение за сессией
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async(user) => {
   currentUser = user;
 
   if (user) {
