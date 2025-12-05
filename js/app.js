@@ -1,6 +1,6 @@
 /* js/app.js */
 /* Глобальные утилиты приходят из utils.js: $, show, clamp, escapeHtml, shuffleArray, fetchJsonNoCache */
-import { startSession, endSession, onLessonStart, onListViewStart, onSelfCheckStart } from './stats.js';
+import { endSession, onLessonStart, onListViewStart, onSelfCheckStart } from './stats.js';
 import { login, logout, getCurrentUser } from './auth.js';
 
 
@@ -497,8 +497,6 @@ function runSelfTests(errorMode = false) {
 /* ===== Boot ===== */
 (async () => {
   try {
-	// запускаем учёт сессии (как только всё загрузилось)
-    startSession();
 	
     const books = await loadBooks();
     state.bookId = books[0] ? String(books[0].id) : '1';

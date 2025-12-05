@@ -2,7 +2,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getFirestore,collection,addDoc,serverTimestamp,doc,updateDoc,arrayUnion} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // 2) ТВОЙ КОНФИГ (скопируй из Firebase → Project settings → Web app)
 const firebaseConfig = {
@@ -23,63 +23,80 @@ const db   = getFirestore(app);
 let currentUserId = null;
 let currentSession = null; // { id, startedAt }
 let currentGame = null;    // { gameName, lessonId, startedAt, errors }
+let currentListView = null;   // { lessonId, startedAt }
+let currentSelfCheck = null;  // { lessonId, startedAt }
+
 
 // ---- АВТОРИЗАЦИЯ  ----
 export function setCurrentUserId(uid) {
   currentUserId = uid;
 }
 
-// ---- АВТОРИЗАЦИЯ (анонимная) ----
+/*/ ---- АВТОРИЗАЦИЯ (анонимная) ----
 signInAnonymously(auth).catch(console.error);
 
 onAuthStateChanged(auth, (user) => {
   if (!user) return;
   currentUserId = user.uid;
   console.log('Firebase user:', currentUserId);
-});
+});*/
 
 // ---- СЕССИИ ПРИЛОЖЕНИЯ ----
 export async function startSession() {
   if (!currentUserId) return; // пользователь ещё не готов
 
   try {
-    const docRef = await addDoc(collection(db, "sessions"), {
-      userId: currentUserId,
-      startedAt: serverTimestamp(),
+    const sessionsCol = collection(db, "sessions");
+    const docRef = await addDoc(sessionsCol, {
+      // базовые поля сессии
+      userId:    currentUserId,
+      sessionId: null,              // заполним сразу после
+      lessonId:  null,
+      openedAt:  serverTimestamp(),
+      durationSec: null,
+
       userAgent: navigator.userAgent,
-      platform: navigator.platform,
+      platform:  navigator.platform,
+
+      // массивы событий
+      games: [],
+      listViewStart: [],
+      selfCheckStarts: []
     });
+
+    // теперь знаем id и сохраняем его внутрь документа
+    await updateDoc(docRef, { sessionId: docRef.id });
+
     currentSession = { id: docRef.id, startedAt: Date.now() };
   } catch (e) {
     console.warn('startSession error:', e);
   }
 }
 
+
 export async function endSession() {
   if (!currentSession || !currentUserId) return;
   const durSec = Math.round((Date.now() - currentSession.startedAt) / 1000);
 
   try {
-    await addDoc(collection(db, "sessionEnds"), {
-      sessionId: currentSession.id,
-      userId: currentUserId,
-      endedAt: serverTimestamp(),
-      durationSec: durSec,
+    const ref = doc(db, "sessions", currentSession.id);
+    await updateDoc(ref, {
+      durationSec: durSec
+      // при желании можно добавить closedAt: serverTimestamp()
     });
   } catch (e) {
     console.warn('endSession error:', e);
   }
 }
 
+
 // ---- УРОКИ ----
 export async function onLessonStart(lessonId) {
-  if (!currentUserId) return;
+  if (!currentUserId || !currentSession) return;
   try {
-    await addDoc(collection(db, "lessonViews"), {
-      userId: currentUserId,
-      sessionId: currentSession?.id || null,
-      lessonId,
-      openedAt: serverTimestamp(),
+    const ref = doc(db, "sessions", currentSession.id);
+    await updateDoc(ref, {
+      lessonId
     });
   } catch (e) {
     console.warn('onLessonStart error:', e);
@@ -87,34 +104,71 @@ export async function onLessonStart(lessonId) {
 }
 
 // ---- ПРОСМОТР СПИСКА СЛОВ ----
-export async function onListViewStart(lessonId) {
-  if (!currentUserId) return;
+export function onListViewStart(lessonId) {
+  if (!currentUserId || !currentSession) return;
+  currentListView = {
+    lessonId,
+    startedAt: Date.now()
+  };
+}
+
+export async function onListViewEnd() {
+  if (!currentUserId || !currentSession || !currentListView) return;
+
+  const durSec = Math.round((Date.now() - currentListView.startedAt) / 1000);
+
+  const entry = {
+    durationSec: durSec,
+    lessonId: currentListView.lessonId ?? null,
+    sessionId: currentSession.id,
+    userId: currentUserId
+  };
+
   try {
-    await addDoc(collection(db, "listViewStarts"), {
-      userId: currentUserId,
-      sessionId: currentSession?.id || null,
-      lessonId: lessonId ?? null,
-      startedAt: serverTimestamp(),
+    const ref = doc(db, "sessions", currentSession.id);
+    await updateDoc(ref, {
+      listViewStart: arrayUnion(entry)
     });
   } catch (e) {
-    console.warn('onListViewStart error:', e);
+    console.warn('onListViewEnd error:', e);
+  } finally {
+    currentListView = null;
   }
 }
 
 // ---- СТАРТ ПРОВЕРКИ СЛОВ (КАРТОЧКИ) ----
 // mode: 'lesson' | 'all' | 'hard'
-export async function onSelfCheckStart({ mode = 'lesson', lessonId = null } = {}) {
-  if (!currentUserId) return;
+export function onSelfCheckStart({ mode = 'lesson', lessonId = null } = {}) {
+  if (!currentUserId || !currentSession) return;
+  currentSelfCheck = {
+    mode,
+    lessonId,
+    startedAt: Date.now()
+  };
+}
+
+export async function onSelfCheckEnd() {
+  if (!currentUserId || !currentSession || !currentSelfCheck) return;
+
+  const durSec = Math.round((Date.now() - currentSelfCheck.startedAt) / 1000);
+
+  const entry = {
+    durationSec: durSec,
+    lessonId: currentSelfCheck.lessonId,
+    sessionId: currentSession.id,
+    userId: currentUserId,
+    mode: currentSelfCheck.mode   // если не нужен mode — можно убрать
+  };
+
   try {
-    await addDoc(collection(db, "selfCheckStarts"), {
-      userId: currentUserId,
-      sessionId: currentSession?.id || null,
-      lessonId,
-      mode,
-      startedAt: serverTimestamp(),
+    const ref = doc(db, "sessions", currentSession.id);
+    await updateDoc(ref, {
+      selfCheckStarts: arrayUnion(entry)
     });
   } catch (e) {
-    console.warn('onSelfCheckStart error:', e);
+    console.warn('onSelfCheckEnd error:', e);
+  } finally {
+    currentSelfCheck = null;
   }
 }
 
@@ -135,25 +189,30 @@ export function onGameError() {
 }
 
 export async function onGameEnd(extra = {}) {
-  if (!currentUserId || !currentGame) return;
+  if (!currentUserId || !currentGame || !currentSession) return;
 
   const durSec = Math.round((Date.now() - currentGame.startedAt) / 1000);
-  const payload = {
-    userId:   currentUserId,
-    sessionId: currentSession?.id || null,
+
+  const entry = {
     gameName: currentGame.gameName,
-    lessonId: currentGame.lessonId || null,
+    lessonId: currentGame.lessonId ?? null,
+    sessionId: currentSession.id,
+    userId: currentUserId,
     durationSec: durSec,
-    errors:   currentGame.errors,
+    errors: currentGame.errors,
     finishedAt: serverTimestamp(),
     ...extra
   };
 
   try {
-    await addDoc(collection(db, "gameRuns"), payload);
+    const ref = doc(db, "sessions", currentSession.id);
+    await updateDoc(ref, {
+      games: arrayUnion(entry)
+    });
   } catch (e) {
     console.warn('onGameEnd error:', e);
   } finally {
     currentGame = null;
   }
 }
+

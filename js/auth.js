@@ -54,9 +54,11 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log('[AUTH] logged in', user.uid);
     setCurrentUserId(user.uid);
+	await startSession();   // ← тут создаётся doc в "sessions"
     showApp(user);
   } else {
     console.log('[AUTH] logged out');
+	await endSession();     // ← опционально, чтобы писать в "sessionEnds"
     setCurrentUserId(null);
     showLogin();
   }
