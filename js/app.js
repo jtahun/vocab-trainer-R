@@ -1,9 +1,7 @@
 /* js/app.js */
 /* Глобальные утилиты приходят из utils.js: $, show, clamp, escapeHtml, shuffleArray, fetchJsonNoCache */
-import { endSession, onLessonStart, onListViewStart, onSelfCheckStart } from './stats.js';
+import { startSession, endSession, initSessionHandlers, onLessonStart, onListViewStart, onSelfCheckStart } from './stats.js';
 import { login, logout, getCurrentUser } from './auth.js';
-
-
 
 const WORDS_URL = './words.json';
 const LS_HARD_KEY = 'vocabHardSetV1';
@@ -517,10 +515,12 @@ function runSelfTests(errorMode = false) {
   }
 })();
 
-// когда пользователь закрывает / перезагружает вкладку
-window.addEventListener('beforeunload', () => {
-  endSession();
+// === Старт сессии и обработчики закрытия ===
+window.addEventListener('load', () => {
+  startSession();        // создаём / фиксируем сессию
+  initSessionHandlers(); // навешиваем обработчики выхода
 });
+
 
 /* ===== SW registration (optional) ===== */
 if ('serviceWorker' in navigator) {

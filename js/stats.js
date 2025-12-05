@@ -53,7 +53,7 @@ export async function startSession() {
       sessionId: null,              // заполним сразу после
       lessonId:  null,
       openedAt:  serverTimestamp(),
-      durationSec: null,
+      durationSec: 0,
 
       userAgent: navigator.userAgent,
       platform:  navigator.platform,
@@ -73,20 +73,42 @@ export async function startSession() {
   }
 }
 
-
 export async function endSession() {
   if (!currentSession || !currentUserId) return;
+  if (sessionEnded) return;          // защита от дублей
+  sessionEnded = true;
+
   const durSec = Math.round((Date.now() - currentSession.startedAt) / 1000);
 
   try {
     const ref = doc(db, "sessions", currentSession.id);
     await updateDoc(ref, {
-      durationSec: durSec
-      // при желании можно добавить closedAt: serverTimestamp()
+      durationSec: durSec,
+      // по желанию:
+      // closedAt: serverTimestamp()
     });
   } catch (e) {
     console.warn('endSession error:', e);
   }
+}
+
+export function initSessionHandlers() {
+  // Закрытие/перезагрузка вкладки (десктоп)
+  window.addEventListener('beforeunload', () => {
+    endSession();
+  });
+
+  // Уход со страницы / bfcache (особенно мобильные браузеры)
+  window.addEventListener('pagehide', () => {
+    endSession();
+  });
+
+  // Смена вкладки / уход приложения в фон
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      endSession();
+    }
+  });
 }
 
 
