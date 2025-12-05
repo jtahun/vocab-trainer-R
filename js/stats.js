@@ -200,7 +200,7 @@ export async function onGameEnd(extra = {}) {
     userId: currentUserId,
     durationSec: durSec,
     errors: currentGame.errors,
-    finishedAt: serverTimestamp(),
+    finishedAt: Date.now(),
     ...extra
   };
 
