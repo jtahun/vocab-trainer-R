@@ -25,6 +25,8 @@ let currentSession = null; // { id, startedAt }
 let currentGame = null;    // { gameName, lessonId, startedAt, errors }
 let currentListView = null;   // { lessonId, startedAt }
 let currentSelfCheck = null;  // { lessonId, startedAt }
+let sessionEnded = false;
+
 
 
 // ---- АВТОРИЗАЦИЯ  ----
