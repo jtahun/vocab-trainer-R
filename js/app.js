@@ -47,6 +47,10 @@ export function getLessonWordsForGame() {
   return (L?.words?.length) ? L.words : null;
 }
 
+export function getCurrentLessonId() {
+  return state.currentLesson?.id ?? null;
+}
+
 /* ===== Hard count in menu ===== */
 function loadHardSet() {
   try { return new Set(JSON.parse(localStorage.getItem(LS_HARD_KEY) || '[]')); }

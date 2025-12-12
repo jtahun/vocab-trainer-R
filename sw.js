@@ -1,4 +1,4 @@
-const CACHE = 'vocab-json-v7.005'; // смени версию, чтобы sw обновился
+const CACHE = 'vocab-json-v7.009'; // смени версию, чтобы sw обновился
 const ASSETS = [
   './',
   './index.html',
