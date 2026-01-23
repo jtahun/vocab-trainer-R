@@ -1,6 +1,6 @@
 // js/modes/list-view.js
 import { onListViewStart, onListViewEnd } from '../stats.js';
-import { setHome, gotoLessons } from '../app.js';
+import { setHome, gotoLessons, formatStudyWord } from '../app.js';
 
 let lessonRef = null;
 
@@ -33,8 +33,14 @@ function renderList(lesson) {
 
   wrap.innerHTML = lesson.words.map(([en, ru]) => `
     <div class="word-row">
-      <span class="word-front">${escapeHtml(en)}</span>
+      <span class="word-front">${escapeHtml(formatStudyWord(en, 'en'))}</span>
       <span class="word-back">— ${escapeHtml(ru)}</span>
     </div>
   `).join('');
 }
+
+
+// Перерисовка при смене настройки транскрипций
+window.addEventListener('vocab:transcriptionChanged', () => {
+  try { if (lessonRef) renderList(lessonRef); } catch {}
+});

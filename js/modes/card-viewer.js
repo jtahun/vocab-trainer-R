@@ -1,5 +1,5 @@
 // js/modes/card-viewer.js
-import { setHome, gotoMenu, updateMenuHardButton } from '../app.js';
+import { setHome, gotoMenu, updateMenuHardButton, formatStudyWord } from '../app.js';
 import { startListView } from './list-view.js';
 import { onSelfCheckStart, onSelfCheckEnd } from '../stats.js';
 
@@ -107,11 +107,11 @@ function renderCard() {
   const pair = L.words[order[i]] || ['—', '—'];
   const [en, ru] = Array.isArray(pair) ? pair : ['—', '—'];
 
-  const front = dir === 'en-ru' ? en : ru;
-  const back  = dir === 'en-ru' ? ru : en;
+  const frontLang = (dir === 'en-ru') ? 'en' : 'ru';
+  const backLang  = (dir === 'en-ru') ? 'ru' : 'en';
 
-  $('word-front').textContent = front;
-  $('word-back').textContent  = back;
+  $('word-front').textContent = formatStudyWord((dir === 'en-ru') ? en : ru, frontLang);
+  $('word-back').textContent  = formatStudyWord((dir === 'en-ru') ? ru : en, backLang);
   show($('word-back'), revealed);
 
   $('counter').textContent = `${i + 1} / ${L.words.length}`;
@@ -280,3 +280,9 @@ function unbindGestures() {
 
   gestureHandlers = null;
 }
+
+
+// Перерисовка при смене настройки транскрипций
+window.addEventListener('vocab:transcriptionChanged', () => {
+  try { renderCard(); } catch {}
+});

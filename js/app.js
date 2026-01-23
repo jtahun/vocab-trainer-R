@@ -5,12 +5,40 @@ import { startCardViewer } from './modes/card-viewer.js';
 
 const WORDS_URL = './words.json';
 const LS_HARD_KEY = 'vocabHardSetV1';
+const LS_SHOW_TRANS_KEY = 'vocabShowTranscriptionV1';
 
 const state = {
+  showTranscription: true,
   lessons: [],
   currentLesson: null,
   bookId: ''
 };
+
+
+function loadShowTranscription() {
+  const raw = localStorage.getItem(LS_SHOW_TRANS_KEY);
+  if (raw === null) return true; // по умолчанию показываем
+  return raw === '1';
+}
+function saveShowTranscription(v) {
+  localStorage.setItem(LS_SHOW_TRANS_KEY, v ? '1' : '0');
+}
+
+export function getShowTranscription() {
+  return !!state.showTranscription;
+}
+
+// Для режимов обучения (карточки/список): по настройке можно скрыть транскрипцию
+export function formatStudyWord(text, lang) {
+  if (lang !== 'en') return String(text ?? '');
+  return state.showTranscription ? String(text ?? '') : stripTranscription(text);
+}
+
+// Для игр: всегда без транскрипции (иначе ломает unscramble и мешает восприятию)
+export function formatGameWordEn(text) {
+  return stripTranscription(text);
+}
+
 
 export function setHome(label, handler) {
   const bh = $('btn-home');
@@ -44,7 +72,13 @@ export function gotoLessons() {
 
 export function getLessonWordsForGame() {
   const L = state.currentLesson;
-  return (L?.words?.length) ? L.words : null;
+  if (!(L?.words?.length)) return null;
+
+  // Для игр всегда отдаём EN без транскрипции (иначе ломает unscramble и мешает восприятию)
+  return L.words.map(pair => {
+    const [en, ru] = Array.isArray(pair) ? pair : ['', ''];
+    return [formatGameWordEn(en), String(ru ?? '')];
+  });
 }
 
 export function getCurrentLessonId() {
@@ -255,9 +289,25 @@ document.addEventListener('lesson-selected', async () => {
 /* Boot */
 (async () => {
   try {
+    state.showTranscription = loadShowTranscription();
     const books = await loadBooks();
     state.bookId = books[0] ? String(books[0].id) : '1';
     populateBookSelect(books);
+    // Кнопка: показывать/скрывать транскрипцию в режимах обучения
+    const btnTrans = $('toggle-transcription');
+    if (btnTrans) {
+      const syncLabel = () => {
+        btnTrans.textContent = state.showTranscription ? 'Транскр.: Вкл' : 'Транскр.: Выкл';
+      };
+      syncLabel();
+      btnTrans.addEventListener('click', () => {
+        state.showTranscription = !state.showTranscription;
+        saveShowTranscription(state.showTranscription);
+        syncLabel();
+        try { window.dispatchEvent(new CustomEvent('vocab:transcriptionChanged')); } catch {}
+      });
+    }
+
 
     const { lessons } = await loadLessonsByBookId(state.bookId);
     state.lessons = lessons;
