@@ -1505,8 +1505,229 @@
       }
 	 ]
     },
+	{
+     "id": 5,
+     "title": "Hedgehog Bob and Tom",
+     "lessons": [
+       {
+         "id": 1,
+         "title": "Part 1",
+         "words": [
+		    ["a creature [ˈkriːtʃə]", "существо"],
+            ["a diary [ˈdaɪəri]", "дневник"],
+            ["a hedgehog [ˈhedʒhɒɡ]", "ёж, ежик"],
+            ["a plant [plɑːnt]", "растение"],
+            ["a teenager [ˈtiːnˌeɪdʒə]", "тинейджер, подросток от 13 до 19 лет"],
+            ["an overgrown garden", "заросший сад"],
+            ["by human standards", "по человеческим меркам"],
+            ["curious [ˈkjʊəriəs]", "любопытный"],
+            ["for sale [fə ˈseɪl]", "на продажу, продается"],
+            ["good-looking [ˌɡʊd ˈlʊkɪŋ]", "симпатичный"]
+         ]
+       },
+	   {
+         "id": 2,
+         "title": "Part 2",
+         "words": [
+		    ["hard-working [ˌhɑːd ˈwɜːkɪŋ]", "трудолюбивый"],
+            ["I am smart for my age.", "Я умен для своего возраста."],
+            ["in the suburbs [ɪn ðə ˈsʌbɜːbz]", "на окраине"],
+            ["noisy [ˈnɔɪzi]", "шумный"],
+            ["quick-tempered [ˌkwɪk ˈtempəd]", "раздражительный"],
+            ["sharp spines [ʃɑːp spaɪnz]", "острые иголки"],
+            ["strict [strɪkt]", "строгий"],
+            ["to bring up", "растить, воспитывать"],
+            ["to explore [ɪkˈsplɔː]", "изучать"],
+            ["to knit [nɪt]", "вязать"]
+         ]
+       },
+	   {
+         "id": 3,
+         "title": "Part 3",
+         "words": [
+		    ["to make noise [nɔɪz]", "шуметь"],
+            ["to move [muːv]", "зд. переезжать"],
+            ["a bunk bed", "двухэтажная кровать"],
+            ["a chest of drawers [ˌtʃest əv ˈdrɔːz]", "комод"],
+            ["a cot", "кроватка (для младенцев)"],
+            ["a robin [ˈrɒbɪn]", "малиновка"],
+            ["a rocking chair", "кресло-качалка"],
+            ["amusing [əˈmjuːzɪŋ]", "забавный"],
+            ["an insect [ˈɪnsekt]", "насекомое"],
+            ["brave [breɪv]", "смелый"]
+
+         ]
+       },
+	   {
+         "id": 4,
+         "title": "Part 4",
+         "words": [
+            ["ceiling [ˈsiːlɪŋ]", "потолок"],
+            ["comfy [ˈkʌmfi]", "удобный"],
+            ["downstairs [ˌdaʊnˈsteəz]", "внизу"],
+            ["Families live in the same house for generations.", "Семьи живут в одном и том же доме поколениями."],
+            ["Grandpa doesn’t mind.", "Дедушка не возражает."],
+            ["His legs are like trees.", "Его ноги похожи на деревья."],
+            ["messy [ˈmesi]", "неряшливый"],
+            ["quiet [ˈkwaɪət]", "спокойный"],
+            ["tidy [ˈtaɪdi]", "аккуратный"],
+            ["to share a room", "жить в одной комнате с кем-либо"]
+         ]
+       },
+	   {
+         "id": 5,
+         "title": "Part 5",
+         "words": [
+		    ["to tame somebody", "приручить кого-либо"],
+            ["unfair [ˌʌnˈfeə]", "несправедливо"],
+            ["unfortunately [ʌnˈfɔːtʃənətli]", "к сожалению"],
+            ["upstairs [ˌʌpˈsteəz]", "наверху"],
+            ["wallpaper [ˈwɔːlˌpeɪpə]", "обои"],
+            ["an adventure [ədˈventʃə]", "приключение"],
+            ["For what you have tamed, you become responsible forever.", "Мы в ответе за тех, кого приручили."],
+            ["a candle [ˈkændl]", "свеча"],
+            ["a guinea pig [ˈɡɪni pɪɡ]", "морская свинка"],
+            ["a party hat [ˈpɑːti hæt]", "празднечная шляпа"]
+         ]
+       },
+	   {
+         "id": 6,
+         "title": "Part 6",
+         "words": [
+		    ["a playmate [ˈpleɪmeɪt]", "товарищ (партнёр) по играм"],
+            ["a tortoise [ˈtɔːtəs]", "черепаха"],
+            ["a vet surgery [ˈvet ˌsɜːdʒəri]", "ветеринарная больница"],
+            ["a veterinary (vet) [ˈvetərɪnəri]", "ветеринар"],
+            ["dangerous [ˈdeɪndʒərəs]", "опасный"],
+            ["faithful [ˈfeɪθfʊl]", "верный, преданный"],
+            ["ill [ɪl]", "больной"],
+            ["mouse [maʊs]", "мышь"],
+            ["to bake [beɪk]", "печь"],
+            ["to be away", "отсутствовать"]
+         ]
+       },
+	   {
+         "id": 7,
+         "title": "Part 7",
+         "words": [
+			["to celebrate [ˈselɪbreɪt]", "праздновать"],
+            ["to comfort [ˈkʌmfət]", "утешать"],
+            ["to invite [ɪnˈvaɪt]", "приглашать"],
+            ["to join in [ˌdʒɔɪn ˈɪn]", "присоединяться"],
+            ["to miss [mɪs]", "скучать"],
+            ["to push [pʊʃ]", "толкать"],
+            ["to roll a ball along the path", "катать мяч по тропинке"],
+            ["twice [twaɪs]", "дважды"],
+            ["a newspaper [ˈnjuːzˌpeɪpə]", "газета"],
+            ["rubbish [ˈrʌbɪʃ]", "мусор"]
+         ]
+       },
+	   {
+         "id": 8,
+         "title": "Part 8",
+         "words": [
+		    ["a yogurt tub [ˈjɒɡət tʌb]", "баночка из-под йогурта"],
+            ["primary school [ˈpraɪməri skuːl]", "начальная школа"],
+            ["high school [ˈhaɪ skuːl]", "средняя школа"],
+            ["a ladybird [ˈleɪdiˌbɜːd]", "божья коровка"],
+            ["a nest [nest]", "гнездо"],
+            ["midnight [ˈmɪdnaɪt]", "полночь"],
+            ["to disappear [ˌdɪsəˈpɪə]", "исчезать"],
+            ["to steal [stiːl]", "украсть"],
+            ["to recycle [ˌriːˈsaɪkl]", "перерабатывать (мусор)"],
+            ["to describe [dɪˈskraɪb]", "описывать"]
+         ]
+       },
+	   {
+         "id": 9,
+         "title": "Part 9",
+         "words": [
+		    ["to drive somebody to school", "подвозить кого-нибудь в школу"],
+            ["to collect somebody from school", "забирать кого-нибудь из школы"],
+            ["to prefer to walk", "предпочитать ходить пешком"],
+            ["My nose stuck in the tub.", "Мой нос застрял в баночке."],
+            ["a play [pleɪ]", "зд. представление"],
+            ["a puppet [ˈpʌpɪt]", "кукла"],
+            ["a voice [vɔɪs]", "голос"],
+            ["a wolf [wʊlf]", "волк"],
+            ["puppet theatre [ˈpʌpɪt ˌθɪətə]", "кукольный театр"],
+            ["quiet [ˈkwaɪət]", "тихий"]
+
+         ]
+       },
+	   {
+         "id": 10,
+         "title": "Part 10",
+         "words": [
+		    ["soft [sɒft]", "мягкий"],
+            ["stomach [ˈstʌmək]", "зд. брюхо"],
+            ["to be curious [ˈkjʊəriəs]", "интересоваться"],
+            ["to play [pleɪ]", "зд. играть в пьесе"],
+            ["jam [dʒæm]", "варенье"],
+            ["strawberry [ˈstrɔːbəri]", "клубника"],
+            ["traffic [ˈtræfɪk]", "транспорт"],
+            ["a traffic jam", "пробка на дороге"],
+            ["a block of flats", "многоэтажный дом"],
+            ["a button [ˈbʌtn]", "кнопка"]
+
+         ]
+       },
+	   {
+         "id": 11,
+         "title": "Part 11",
+         "words": [
+		    ["a mirror [ˈmɪrə]", "зеркало"],
+            ["the lost property room [ˈprɒpəti]", "бюро находок"],
+            ["a sticker [ˈstɪkə]", "наклейка"],
+            ["to recognise [ˈrekəɡnaɪz]", "узнавать"],
+            ["social [ˈsəʊʃl]", "общественный, социальный"],
+            ["at the same time", "в то же время"],
+            ["by accident [ˈæksɪdənt]", "случайно"],
+            ["a neighbour [ˈneɪbə]", "сосед"],
+            ["a chick [tʃɪk]", "птенец"],
+            ["a fence [fens]", "забор"]
+
+         ]
+       },
+	   {
+         "id": 12,
+         "title": "Part 12",
+         "words": [		    
+			["a hole [həʊl]", "дырка"],
+            ["a ladder [ˈlædə]", "лестница"],
+            ["a puddle [ˈpʌdl]", "лужа"],
+            ["a spine [spaɪn]", "колючка"],
+            ["to pinch somebody’s nose", "ущипнуть кого-нибудь за нос"],
+            ["to bite [baɪt]", "кусать"],
+            ["to curl up [kɜːl ʌp]", "сворачиваться клубком"],
+            ["to hide [haɪd]", "прятаться"],
+            ["to follow somebody [ˈfɒləʊ]", "следовать за кем-нибудь"],
+            ["to howl [haʊl]", "выть"]
+
+         ]
+       },
+	   {
+         "id": 13,
+         "title": "Part 13",
+         "words": [
+		    ["to look after somebody", "присматривать за кем-либо"],
+            ["They say the dog takes after its master.", "Говорят, собака похожа на своего хозяина."],
+            ["a picnic [ˈpɪknɪk]", "пикник"],
+            ["a watermelon [ˈwɔːtəˌmelən]", "арбуз"],
+            ["the North Pole [ˌnɔːθ ˈpəʊl]", "Северный полюс"],
+            ["a storm [stɔːm]", "шторм"],
+            ["a thunderstorm [ˈθʌndəstɔːm]", "гроза"],
+            ["lightning [ˈlaɪtnɪŋ]", "молния"],
+            ["a weatherman [ˈweðəmæn]", "синоптик"],
+            ["to rely on the weather forecast", "полагаться на прогноз погоды"]
+
+         ]
+       }	   
+     ]
+   },
+	
     {
-      "id": 5,
+      "id": 6,
       "title": "Рената",
       "lessons": [
         {
@@ -1536,7 +1757,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 7,
       "title": "Юлия",
       "lessons": [
         {
